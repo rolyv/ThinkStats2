@@ -43,26 +43,21 @@ def ValidatePregnum(resp):
 
     resp: respondent DataFrame
     """
-    # make a dictionary that maps from caseid to respondent index
-    d = {}
-    for index, caseid in resp.caseid.iteritems():
-        d[caseid] = index
-
     # read the pregnancy frame
     preg = nsfg.ReadFemPreg()
 
     # make the map from caseid to list of pregnancy indices
     preg_map = nsfg.MakePregMap(preg)
     
-    # iterate through the preg_map
-    for caseid, indices in preg_map.items():
-        row = resp[resp.caseid==caseid]
-        pregnum = row.pregnum.values[0]
+    # iterate through the respondent pregnum series
+    for index, pregnum in resp.pregnum.iteritems():
+        caseid = resp.caseid[index]
+        indices = preg_map[caseid]
 
         # check that pregnum from the respondent file equals
         # the number of records in the pregnancy file
         if len(indices) != pregnum:
-            print(caseid, len(indices), resp.pregnum[index])
+            print(caseid, len(indices), pregnum)
             return False
 
     return True
